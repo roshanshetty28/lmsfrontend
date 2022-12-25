@@ -1,0 +1,113 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.app {
+  margin: 1px auto;
+  border: 3px solid black;
+  padding: 14px;
+  border-radius: 12px;
+  /* max-width: 768px; */
+  /* background-color: rgb(123, 103, 103); */
+  min-height: 100vh;
+  max-height: fit-content;
+}
+
+/* navbar component*/
+.navbar {
+  display: flex;
+  align-items: center;
+  background-color: cornflowerblue;
+  justify-content: space-between;
+  height: 60px;
+  flex-direction: row;
+  position: sticky;
+  top: 0px;
+}
+
+/* librarian's page */
+.librarian {
+  padding: 1%;
+}
+
+.librariantab {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: rgb(242, 194, 106);
+  border-radius: 8px;
+  margin: 1%;
+}
+
+.librariantab a {
+  /* background: #f0f0f0; */
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-decoration: none;
+  width: 25%;
+  text-align: center;
+}
+
+.librariantab a:hover {
+  background-color: rgb(178, 132, 242);
+}
+
+.librariantab a.active {
+  color: #fff;
+  background: #7600dc;
+}
+
+/* user's page */
+.usertab {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: rgb(242, 194, 106);
+  border-radius: 8px;
+  margin: 1%;
+}
+
+.usertab a {
+  /* background: #f0f0f0; */
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-decoration: none;
+  width: 50%;
+  text-align: center;
+}
+
+.usertab a:hover {
+  background-color: rgb(178, 132, 242);
+}
+
+.usertab a.active {
+  color: #fff;
+  background: #7600dc;
+}
+
+/*pagination*/
+.pagination {
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.page-item {
+  border: 1px solid grey;
+  padding: 5px;
+  list-style: none;
+  color: blue;
+}
+
+.page-link {
+  cursor: pointer;
+}
+
+.active {
+  background-color: blue;
+  color: white;
+}
