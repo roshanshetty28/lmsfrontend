@@ -39,7 +39,7 @@ const BooksUser = ({ book }) => {
   const handleView = () => {
     // navigate('../' + book._id)
     // window.location.reload()
-    window.open('http://localhost:3000/users/' + book._id, "_blank")
+    window.open('https://librarymngsys.netlify.app/users/' + book._id, "_blank")
   }
   const handleAddWish = () => {
     const id = book._id.toString()
