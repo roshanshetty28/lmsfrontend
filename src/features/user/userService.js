@@ -2,32 +2,35 @@ import axios from "axios";
 
 const API_URL = "https://librarymngsys.adaptable.app/api/user";
 
-const getAllBooks = async ({ query, token }) => {
+const getAllBooks = async ({ query, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
   const result = "?" + new URLSearchParams(query).toString();
   const response = await axios.get(API_URL + "/all" + result, config);
   return response.data;
 };
 
-const getIssuedBooks = async (token) => {
+const getIssuedBooks = async ({ token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
   const response = await axios.get(API_URL + "/", config);
   return response.data;
 };
 
-const requestedBooks = async (token) => {
+const requestedBooks = async ({ token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
   const response = await axios.get(API_URL + "/requested", config);
   return response.data;
@@ -53,21 +56,23 @@ const cancelRequest = async ({ token, id }) => {
   return response.data;
 };
 
-const bookDetails = async ({ id, token }) => {
+const bookDetails = async ({ id, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
   const response = await axios.get(API_URL + `/book/${id}`, config);
   return response.data;
 };
 
-const relatedBooks = async ({ data, token }) => {
+const relatedBooks = async ({ data, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
   const result = "?" + new URLSearchParams(data).toString();
   const response = await axios.get(API_URL + "/related" + result, config);
@@ -108,11 +113,12 @@ const addToWish = async ({ id, token }) => {
   return response.data;
 };
 
-const getWish = async (token) => {
+const getWish = async ({ token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
   const response = await axios.get(API_URL + "/wishlist", config);
   return response.data;
@@ -148,6 +154,51 @@ const subscribe = async (token) => {
   return response.data;
 };
 
+const getComments = async ({ id, token, signal }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    signal: signal,
+  };
+  const response = await axios.get(API_URL + `/comments/${id}`, config);
+  return response.data;
+};
+
+const deleteComment = async ({ data, token }) => {
+  const response = await axios.delete(API_URL + `/delete-comment/${data.id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: { bookID: data.bookID },
+  });
+  return response.data;
+};
+
+const addReview = async ({ data, token }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.post(API_URL + "/add-review", data, config);
+  return response.data;
+};
+
+const modifyComment = async ({ data, token }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.patch(
+    API_URL + `/update-comment/${data.commentID}`,
+    { comment: data.comment, bookID: data.bookID },
+    config
+  );
+  return response.data;
+};
+
 const userService = {
   getAllBooks,
   getIssuedBooks,
@@ -164,6 +215,10 @@ const userService = {
   removefromWish,
   contact,
   subscribe,
+  getComments,
+  deleteComment,
+  addReview,
+  modifyComment,
 };
 
 export default userService;

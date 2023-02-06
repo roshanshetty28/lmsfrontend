@@ -1,66 +1,74 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux'
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux'
 import { addBook } from '../../features/admin/adminSlice'
+import { useFormik } from 'formik'
+import { addBookSchema } from '../../schema/AdminSchema'
 
 import Box from '@mui/material/Box';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+
+const initialValues = {
+  title: "knk",
+  author: "jn",
+  total: "1",
+  rating: "1",
+  numOfRatings: "1",
+  genre: ['action']
+}
 
 const AddBook = () => {
   const dispatch = useDispatch()
-  const categories = [
-    { id: 1, type: 'action' },
-    { id: 2, type: 'drama' },
-    { id: 3, type: 'romance' },
-    { id: 4, type: 'sci - fi' },
-    { id: 5, type: 'comedy' },
-  ];
-  const [selected, setSelected] = useState([]);
-  const [title, setTitle] = useState("")
-  const [author, setAuthor] = useState("")
-  const [total, setTotal] = useState("")
-  const [rating, setRating]=useState("")
-  const handleChange = (e) => {
-    if (e.target.checked) {
-      setSelected([...selected, e.target.value]);
-    } else {
-      setSelected(selected.filter((sel) => sel !== e.target.value));
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue } = useFormik({
+    initialValues: initialValues,
+    validationSchema: addBookSchema,
+    onSubmit: async(values, { resetForm }) => {
+      dispatch(addBook(values))
+      resetForm()
     }
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (author === '' || title === '' || total === ''||rating==='') {
-      alert('Enter all details')
-    } else if (selected.length === 0) {
-      alert('Select a Genre')
+  })
+  const { isLoading } = useSelector((state) => state.admin)
+  const categories = ["action", "drama", "sci - fi", "romance", "comedy"];
+  const handleGenreChange = (e) => {
+    if (e.target.checked) {
+      setFieldValue("genre", [...values.genre, e.target.value]);
     } else {
-      const data = { author: author, title: title, genre: selected, total: total,rating:rating }
-      dispatch(addBook(data))
+      setFieldValue("genre", values.genre.filter((sel) => sel !== e.target.value));
     }
   };
   return (
-    <Box sx={{ m: 2, p: 2, border: '1px solid black', borderRadius: '8px' }}>
+    <Card sx={{ m: 2, p: 2, backgroundColor: '#c4d3f5' }}>
       <Box sx={{ m: 1 }}>
         <TextField
           required
-          id="outlined-required"
+          multiline
+          fullWidth
+          name="title"
+          id="add-title"
           label="Title"
-          value={title}
-          onChange={(e) => { setTitle(e.target.value) }}
+          value={values.title}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          helperText={errors.title && touched.title ? errors.title : null}
+          error={errors.title && touched.title}
         />
       </Box>
       <Box sx={{ m: 1 }}>
         <TextField
           required
-          id="outlined-required"
+          multiline
+          fullWidth
+          id="add-author"
           label="Author"
-          value={author}
-          onChange={(e) => { setAuthor(e.target.value) }}
+          name="author"
+          value={values.author}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          helperText={errors.author && touched.author ? errors.author : null}
+          error={errors.author && touched.author}
         />
       </Box>
       <Box sx={{ m: 1 }}>
@@ -68,43 +76,73 @@ const AddBook = () => {
           required
           type='number'
           InputProps={{ inputProps: { min: 0 } }}
-          id="outlined-required"
+          id="add-rating"
           label="Rating"
-          value={rating}
-          onChange={(e) => { setRating(e.target.value) }}
+          name="rating"
+          value={values.rating}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          helperText={errors.rating && touched.rating ? errors.rating : null}
+          error={errors.rating && touched.rating}
+
         />
       </Box>
-      <Box sx={{ border: '0.1px solid #a6bfbc', borderRadius: '5px', m: 1, width: 222,display:'flex',flexDirection:'column' }}>
-        <Typography variant='p' sx={{p:1,color:'grey'}}>
+      <Box sx={{ m: 1 }}>
+        <TextField
+          required
+          type='number'
+          InputProps={{ inputProps: { min: 0 } }}
+          id="add-numOfRatings"
+          label="Num Of Ratings"
+          name="numOfRatings"
+          value={values.numOfRatings}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          helperText={errors.numOfRatings && touched.numOfRatings ? errors.numOfRatings : null}
+          error={errors.numOfRatings && touched.numOfRatings}
+
+        />
+      </Box>
+      <Box sx={{ border: '0.1px solid #9fa3ab', borderRadius: '5px', m: 1, width: 222, display: 'flex', flexDirection: 'column' }}>
+        <Typography variant='p' sx={{ p: 1, color: 'grey' }}>
           Genre *
         </Typography>
-        <FormGroup >
+        <Box>
           {categories.map((cat) => (
-            <FormControlLabel
-              onChange={handleChange}
-              key={cat.id}
-              value={cat.type}
-              control={<Checkbox sx={{ pl: 2 }} />}
-              label={cat.type}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'row' }} key={cat}>
+              <input
+                id={cat}
+                type="checkbox"
+                name={cat}
+                value={cat}
+                checked={values.genre.includes(cat)}
+                onChange={handleGenreChange}
+                onBlur={handleBlur}
+              />
+              <label htmlFor={cat}>{cat}</label>
+            </Box>
           ))}
-        </FormGroup>
+        </Box>
       </Box>
       <Box sx={{ m: 1 }}>
         <TextField
           required
           type='number'
           InputProps={{ inputProps: { min: 1 } }}
-          id="outlined-required"
+          id="add-total"
           label="Total Books"
-          value={total}
-          onChange={(e) => { setTotal(e.target.value) }}
+          name="total"
+          value={values.total}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          helperText={errors.total && touched.total ? errors.total : null}
+          error={errors.total && touched.total}
         />
       </Box>
-      <Box sx={{ pl: 1 }}>
-        <Button sx={{ backgroundColor: '#89e681', '&:hover': { backgroundColor: '#5ad14f' } }} variant='contained' onClick={handleSubmit} startIcon={<AddCircleOutlineIcon />}>Add Book</Button>
+      <Box sx={{ pl: 1, display: 'flex', justifyContent: 'center' }}>
+        <Button disabled={isLoading === true ? true : false} fullWidth sx={{ backgroundColor: '#89e681', '&:hover': { backgroundColor: '#5ad14f' } }} variant='contained' onClick={handleSubmit} startIcon={<AddCircleOutlineIcon />}>{isLoading === false ? 'Add Book' : 'Adding...'}</Button>
       </Box>
-    </Box>
+    </Card>
   );
 };
 export default AddBook;

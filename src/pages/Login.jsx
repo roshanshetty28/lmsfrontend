@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, reset } from '../features/auth/authSlice'
+import { useFormik } from "formik"
+import { loginSchema } from '../schema/AuthSchema'
+import Footer from '../components/Footer';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -11,24 +14,26 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Card from '@mui/material/Card';
+import Divider from '@mui/material/Divider';
+
+const initialValues = {
+  email: "ad@gm.co",
+  password: "John@222",
+}
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [type, setType] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch()
-  const { isSuccess } = useSelector((state) => state.auth)
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const userData = {
-      email: email,
-      password: password,
-      admin: type
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
+    initialValues: initialValues,
+    validationSchema: loginSchema,
+    onSubmit: (values, { resetForm }) => {
+      dispatch(login({ ...values, admin: type }))
+      resetForm()
     }
-    dispatch(login(userData))
-  };
+  })
+  const { isSuccess, isLoading } = useSelector((state) => state.auth)
   useEffect(() => {
     if (isSuccess) {
       if (type === true) {
@@ -42,27 +47,37 @@ const Login = () => {
   }, [isSuccess, navigate, dispatch])
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', height: '93vh', alignItems: 'center' }}>
-      <Card sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'pink', width: '270px', height: 'fit-content' }}>
+    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <Card sx={{ p: 2, m: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: '#c1d2f5', width: '300px', height: 'fit-content' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <Typography variant="h3" component='h3'>Login</Typography>
         </Box>
         <Box sx={{ m: 2 }}>
           <TextField
             required
-            id="outlined-required"
+            name="email"
+            type="email"
+            id="login-email"
             label="Email"
-            value={email}
-            onChange={(e) => { setEmail(e.target.value) }}
+            value={values.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            helperText={errors.email && touched.email ? errors.email : null}
+            error={errors.email && touched.email}
           />
         </Box>
         <Box sx={{ m: 2 }}>
           <TextField
             required
-            id="outlined-required"
+            name="password"
+            type='password'
+            id="login-password"
             label="Password"
-            value={password}
-            onChange={(e) => { setPassword(e.target.value) }}
+            value={values.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            helperText={errors.password && touched.password ? errors.password : null}
+            error={errors.password && touched.password}
           />
         </Box>
         <Box>
@@ -83,9 +98,11 @@ const Login = () => {
           <Typography><NavLink to='/register'>Register</NavLink></Typography>
         </Box>
         <Box>
-          <Button sx={{ m: 2 }} variant='contained' onClick={handleSubmit}>Login</Button>
+          <Button disabled={isLoading === true ? true : false} sx={{ m: 2 }} variant='contained' onClick={handleSubmit}>{isLoading === false ? 'Login' : 'Loging in...'}</Button>
         </Box>
       </Card>
+      <Divider sx={{ width: '100%', m: 2 }} />
+      <Footer />
     </Box>
   );
 };

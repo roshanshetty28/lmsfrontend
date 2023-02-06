@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { deleteBook, updateStock } from '../../features/admin/adminSlice'
 
 import Box from '@mui/material/Box';
@@ -18,6 +18,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Rating from '@mui/material/Rating';
 
 const InventoryCard = ({ book }) => {
+    const { isLoading } = useSelector((state) => state.admin)
     const [update, setUpdate] = useState(false)
     const [quantity, setQuantity] = useState('')
     const [action, setAction] = useState('')
@@ -42,12 +43,12 @@ const InventoryCard = ({ book }) => {
         dispatch(deleteBook(book._id))
     }
     return (
-        <Card sx={{ p: 1, m: 1, pr: 2, pl: 0, minWidth: 240, backgroundColor: '#d3e5f2', boxShadow: '1px 2px #3f48f2' }}>
+        <Card sx={{ p: 1, m: 1, pr: 2, pl: 0, minWidth: 240, backgroundColor: '#84ceeb', boxShadow: '1px 2px #3f48f2' }}>
             <CardHeader sx={{ pb: 0 }} title={book.title}>
             </CardHeader>
             <CardContent sx={{ mt: 0, pt: 0, pb: 0 }}>
-                <Typography>Author:{book.author}</Typography>
-                <Typography>Genre:{book.genre.toString()}</Typography>
+                <Typography>Author:&nbsp;{book.author}</Typography>
+                <Typography>Genre:&nbsp;{book.genre.toString()}</Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                     <Typography>Rating:</Typography>
                     <Rating
@@ -57,8 +58,8 @@ const InventoryCard = ({ book }) => {
                         readOnly
                     />
                     <Typography>{book.rating}</Typography></Box>
-                <Typography>Book ID:{book._id}</Typography>
-                <Typography>Stock:{book.stock}</Typography>
+                <Typography>Book ID:&nbsp;{book._id}</Typography>
+                <Typography>Stock:&nbsp;{book.stock}</Typography>
             </CardContent>
             <Collapse in={update} timeout="auto" unmountOnExit>
                 <CardContent>
@@ -75,8 +76,8 @@ const InventoryCard = ({ book }) => {
                     />
                     <Box sx={{ mt: 1, minWidth: 120 }}>
                         <FormControl>
-                            <InputLabel id="demo-simple-select-label" >Action:</InputLabel>
-                            <Select sx={{ width: 150 }} label="Action" labelId="demo-simple-select-label" id="demo-simple-select" value={action} onChange={(e) => setAction(e.target.value)}>
+                            <InputLabel id="inv-card-label" >Action:</InputLabel>
+                            <Select sx={{ width: 150 }} label="Action" labelId="demo-simple-select-label" id="inv" value={action} onChange={(e) => setAction(e.target.value)}>
                                 <MenuItem value="add">Add</MenuItem>
                                 <MenuItem value="subtract">Subtract</MenuItem>
                             </Select>
@@ -85,8 +86,8 @@ const InventoryCard = ({ book }) => {
                 </CardContent>
             </Collapse>
             <CardActions sx={{ m: 0, p: 0, ml: 2, mb: 1 }}>
-                <Button variant='outlined' color='error' onClick={handleDelete}>Delete Book</Button>
-                <Button variant='contained' onClick={handleQuantity}>Update Quantity</Button>
+                <Button disabled={isLoading === true ? true : false} variant='outlined' color='error' onClick={handleDelete}>{isLoading === false ? 'Delete Book' : 'Deleting...'}</Button>
+                <Button disabled={isLoading === true ? true : false} variant='contained' onClick={handleQuantity}>{isLoading === false ? 'Update Quantity' : 'Updating...'}</Button>
             </CardActions>
 
         </Card>

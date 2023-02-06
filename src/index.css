@@ -7,21 +7,16 @@ body {
 }
 
 .app {
-  margin: 1px auto;
-  border: 3px solid black;
   padding: 14px;
-  border-radius: 12px;
-  /* max-width: 768px; */
-  /* background-color: rgb(123, 103, 103); */
-  min-height: 100vh;
-  max-height: fit-content;
+  background-color: #c1c8e4;
+  min-height: 97vh;
 }
 
 /* navbar component*/
 .navbar {
   display: flex;
   align-items: center;
-  background-color: cornflowerblue;
+  background-color: #8860d0;
   justify-content: space-between;
   height: 60px;
   flex-direction: row;
@@ -58,7 +53,7 @@ body {
 
 .librariantab a.active {
   color: #fff;
-  background: #7600dc;
+  background: #5680e9;
 }
 
 /* user's page */
@@ -107,7 +102,44 @@ body {
   cursor: pointer;
 }
 
-.active {
+.activePage {
   background-color: blue;
   color: white;
+}
+
+/* editable comment */
+#editableComment:focus-within {
+  background-color: aqua;
+  border: 1px solid black;
+}
+
+/* for drawer */
+.elemBox {
+  text-align: center;
+  padding: 10px;
+  font-size: 20px;
+}
+
+.elemBox:hover {
+  background-color: rgb(168, 142, 244);
+}
+
+.elemBox a {
+  text-decoration: none;
+}
+
+.elemBox a:link {
+  color: black;
+}
+
+.elemBox a:visited {
+  color: black;
+}
+
+.elemBox a:active {
+  color: black;
+}
+
+.elemBox a:hover {
+  color: black;
 }

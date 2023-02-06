@@ -25,12 +25,13 @@ const unsuccessful = {
 };
 
 const initialState = {
-  userBooks: [],
+  userBooks: { books: [], total: 0 },
   userIssued: [],
   requested: [],
-  related: [],
+  related: { books: [], total: 0 },
   book: {},
   wishlist: [],
+  comments: [],
   pages: 1,
   isError: false,
   isSuccess: false,
@@ -43,7 +44,11 @@ export const getAllBooks = createAsyncThunk(
   async (query, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await userService.getAllBooks({ query, token });
+      return await userService.getAllBooks({
+        query,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -61,7 +66,10 @@ export const getIssuedBooks = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await userService.getIssuedBooks(token);
+      return await userService.getIssuedBooks({
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -79,7 +87,10 @@ export const requestedBooks = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await userService.requestedBooks(token);
+      return await userService.requestedBooks({
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -133,7 +144,11 @@ export const bookDetails = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await userService.bookDetails({ id, token });
+      return await userService.bookDetails({
+        id,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -151,7 +166,11 @@ export const relatedBooks = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await userService.relatedBooks({ data, token });
+      return await userService.relatedBooks({
+        data,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -237,7 +256,7 @@ export const addToWish = createAsyncThunk(
 export const getWish = createAsyncThunk("user/getWish", async (_, thunkAPI) => {
   try {
     const token = thunkAPI.getState().auth.user.token;
-    return await userService.getWish(token);
+    return await userService.getWish({ token, signal: thunkAPI.signal });
   } catch (error) {
     const message =
       (error.response && error.response.data && error.response.data.message) ||
@@ -301,18 +320,94 @@ export const subscribe = createAsyncThunk(
   }
 );
 
+export const getComments = createAsyncThunk(
+  "user/getComments",
+  async (id, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await userService.getComments({
+        id,
+        token,
+        signal: thunkAPI.signal,
+      });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const deleteComment = createAsyncThunk(
+  "user/deleteComment",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await userService.deleteComment({ data, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const addReview = createAsyncThunk(
+  "user/addReview",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await userService.addReview({ data, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const modifyComment = createAsyncThunk(
+  "user/modifyComment",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await userService.modifyComment({ data, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const userBooksSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     resetUser: (state) => {
-      state.userBooks = [];
+      state.userBooks = { books: [], total: 0 };
       state.userIssued = [];
       state.requested = [];
-      state.related = [];
+      state.related = { books: [], total: 0 };
       state.book = {};
       state.wishlist = [];
-      state.pages = 1;
+      state.comments = [];
       state.isError = false;
       state.isSuccess = false;
       state.isLoading = false;
@@ -327,8 +422,10 @@ export const userBooksSlice = createSlice({
       .addCase(getAllBooks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.userBooks = action.payload.books;
-        state.pages = action.payload.total;
+        state.userBooks.books = action.payload.result;
+        state.userBooks.books.length === 0
+          ? (state.userBooks.total = 0)
+          : (state.userBooks.total = action.payload.count.count);
       })
       .addCase(getAllBooks.rejected, (state, action) => {
         state.isLoading = false;
@@ -339,9 +436,9 @@ export const userBooksSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getIssuedBooks.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.isSuccess = true;
         state.userIssued = action.payload;
+        state.isLoading = false;
       })
       .addCase(getIssuedBooks.rejected, (state, action) => {
         state.isLoading = false;
@@ -367,6 +464,7 @@ export const userBooksSlice = createSlice({
       .addCase(requestBook.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.requested.push(action.payload);
         toast.success("Book Request Successfully", successful);
       })
       .addCase(requestBook.rejected, (state, action) => {
@@ -384,6 +482,9 @@ export const userBooksSlice = createSlice({
       .addCase(cancelRequest.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.requested = state.requested.filter(
+          (book) => book._id !== action.payload._id
+        );
         toast.success("Request Cancelled Successfully", successful);
       })
       .addCase(cancelRequest.rejected, (state, action) => {
@@ -414,7 +515,10 @@ export const userBooksSlice = createSlice({
       .addCase(relatedBooks.fulfilled, (state, action) => {
         state.isSuccess = true;
         state.isLoading = false;
-        state.related = action.payload;
+        state.related.books = action.payload.result;
+        state.related.books.length === 0
+          ? (state.related.total = 0)
+          : (state.related.total = action.payload.count.count);
       })
       .addCase(relatedBooks.rejected, (state, action) => {
         state.isLoading = false;
@@ -543,11 +647,90 @@ export const userBooksSlice = createSlice({
       .addCase(subscribe.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
+        toast.success("Subscription to newsletter successful", successful);
       })
       .addCase(subscribe.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
+        toast.error("Subscription to newsletter unsuccessful", unsuccessful);
+      })
+      .addCase(getComments.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getComments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.comments = action.payload;
+      })
+      .addCase(getComments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "could not fetch comments. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(deleteComment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.comments = state.comments.filter(
+          (comment) => comment._id !== action.payload
+        );
+        toast.success("Comment Deleted Successfully", successful);
+      })
+      .addCase(deleteComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not delete Comment. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(addReview.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addReview.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.book = action.payload.updateRating;
+        state.comments.push(action.payload.addComment);
+        toast.success("Review added Successfully", successful);
+      })
+      .addCase(addReview.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not post your review. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(modifyComment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(modifyComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.comments = state.comments.filter(
+          (comment) => comment._id !== action.payload._id
+        );
+        state.comments.push(action.payload);
+        toast.success("Comment updated Successfully", successful);
+      })
+      .addCase(modifyComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not update comment. Reason: " + state.message,
+          unsuccessful
+        );
       });
   },
 });

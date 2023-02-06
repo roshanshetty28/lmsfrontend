@@ -82,6 +82,24 @@ export const logout = createAsyncThunk(
   }
 );
 
+export const editDetails = createAsyncThunk(
+  "user/editDetails",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await authService.editDetails({ data, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -101,7 +119,7 @@ export const authSlice = createSlice({
       .addCase(register.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        localStorage.setItem('user', JSON.stringify(action.payload));
+        localStorage.setItem("user", JSON.stringify(action.payload));
         state.user = action.payload;
         toast.success(
           "Registration Successful! Welcome! " + state.user.name,
@@ -124,7 +142,7 @@ export const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        localStorage.setItem('user', JSON.stringify(action.payload));
+        localStorage.setItem("user", JSON.stringify(action.payload));
         state.user = action.payload;
         toast.success("Welcome! " + state.user.name, successful);
       })
@@ -140,6 +158,25 @@ export const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+      })
+      .addCase(editDetails.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(editDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        localStorage.setItem("user", JSON.stringify(action.payload));
+        state.user = action.payload;
+        toast.success("Details updated Successfully", successful);
+      })
+      .addCase(editDetails.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not update details. Reason: " + state.message,
+          unsuccessful
+        );
       });
   },
 });

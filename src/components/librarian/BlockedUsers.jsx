@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { allUsers, deleteUser, block, unblock } from '../../features/admin/adminSlice'
+import { blockedUsers, block, unblock } from '../../features/admin/adminSlice'
 import ReactPaginate from 'react-paginate';
 
 import Box from '@mui/material/Box';
@@ -10,19 +10,14 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const UserDetails = () => {
+const BlockedUsers = () => {
     const limit = 5
     const [curPage, setcurPage] = useState(1)
-    const { users, isLoading } = useSelector(state => state.admin)
+    const { blocked, isLoading } = useSelector(state => state.admin)
     const dispatch = useDispatch()
-    const handleDelete = (id) => {
-        window.confirm("User Will be Permanently Deleted")
-        dispatch(deleteUser(id))
-    }
     const handleBlock = (id) => {
         window.confirm('User will be blocked')
         dispatch(block(id))
@@ -36,14 +31,14 @@ const UserDetails = () => {
     }
     useEffect(() => {
         const data = { page: curPage }
-        const promise = dispatch(allUsers(data))
+        const promise = dispatch(blockedUsers(data))
         return () => promise.abort()
     }, [curPage])
 
     return (
         <>
             {isLoading === true ? <Box sx={{ width: '100%', top: '50%', height: '70vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}><CircularProgress thickness={1} size={200} /></Box> : <Box sx={{ p: 1, maxHeight: '76vh', display: 'flex', flexWrap: 'wrap' }}>
-                {users.users.length !== 0 ? users.users.map((user, index) =>
+                {blocked.users.length !== 0 ? blocked.users.map((user, index) =>
                     <Card key={index} sx={{ m: 1, mb: 2, minWidth: 240, backgroundColor: '#84ceeb', boxShadow: '1px 2px #3f48f2' }}>
                         <CardHeader sx={{ pb: 0 }} title={user.name}>
                         </CardHeader>
@@ -52,9 +47,6 @@ const UserDetails = () => {
                             <Typography>{user._id}</Typography>
                         </CardContent>
                         <CardActions>
-                            <Button onClick={() => handleDelete(user._id)} sx={{ backgroundColor: '#e895a2', '&:hover': { backgroundColor: '#e35d73' } }} variant="contained" startIcon={<DeleteIcon style={{ color: 'red' }} />}>
-                                Delete
-                            </Button>
                             {user.blocked === false ?
                                 <Button sx={{ color: 'white', backgroundColor: '#e895a2', '&:hover': { backgroundColor: '#e35d73' } }} onClick={() => handleBlock(user._id)} variant="contained" startIcon={<BlockIcon style={{ color: 'red' }} />}>Block</Button> :
                                 <Button sx={{ color: 'white', backgroundColor: '#9bed93', '&:hover': { backgroundColor: '#5ad14f' } }} onClick={() => handleUnBlock(user._id)} variant="contained" startIcon={<BlockIcon style={{ color: '#31b825' }} />}>Unblock</Button>}
@@ -63,11 +55,11 @@ const UserDetails = () => {
                 ) : <Typography sx={{ width: '100%', textAlign: 'center' }}>No Users</Typography>}
             </Box>}
             <Box>
-                {users.total !== 0 ? <ReactPaginate
+                {blocked.total !== 0 ? <ReactPaginate
                     previousLabel={'previous'}
                     nextLabel={'next'}
                     breakLabel={'....'}
-                    pageCount={Math.ceil(users.total / limit)}
+                    pageCount={Math.ceil(blocked.total / limit)}
                     marginPagesDisplayed={1}
                     pageRangeDisplayed={2}
                     onPageChange={handlePageClick}
@@ -87,4 +79,4 @@ const UserDetails = () => {
     )
 }
 
-export default UserDetails
+export default BlockedUsers

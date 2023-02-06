@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { issueBook } from '../../features/admin/adminSlice'
 
 import Card from '@mui/material/Card';
@@ -10,11 +10,14 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Collapse from '@mui/material/Collapse';
 import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import Rating from '@mui/material/Rating';
 
 const IssueCard = ({ book }) => {
     const [issue, setIssue] = useState(false)
     const [userid, setId] = useState('')
     const dispatch = useDispatch()
+    const { isLoading } = useSelector((state) => state.admin)
     const handleIssue = () => {
         if (issue) {
             if (userid === '') {
@@ -28,12 +31,18 @@ const IssueCard = ({ book }) => {
         else { setIssue(true) }
     }
     return (
-        <Card sx={{ m: 1, mb: 2, minWidth: 240, backgroundColor: '#d3e5f2', boxShadow: '1px 2px #3f48f2' }}>
+        <Card sx={{ m: 1, mb: 2, minWidth: 240, backgroundColor: '#84ceeb', boxShadow: '1px 2px #3f48f2' }}>
             <CardHeader sx={{ pb: 0 }} title={book.title}>
             </CardHeader>
             <CardContent sx={{ mt: 0, pt: 0, pb: 0 }}>
                 <Typography>Author:{book.author}</Typography>
-                <Typography>Rating:rating</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                    <Typography>Rating:</Typography>
+                    <Rating
+                        name="half-rating"
+                        value={book.rating}
+                        precision={0.1}
+                        readOnly /></Box>
                 <Typography>Book ID:{book._id}</Typography>
             </CardContent>
             <Collapse in={issue} timeout="auto" unmountOnExit>
@@ -42,7 +51,7 @@ const IssueCard = ({ book }) => {
                         sx={{ p: 0, m: 0 }}
                         required
                         margin='none'
-                        id="outlined-required"
+                        id="issue-card-userid"
                         label="User ID"
                         type='text'
                         value={userid}
@@ -51,7 +60,7 @@ const IssueCard = ({ book }) => {
                 </CardContent>
             </Collapse>
             <CardActions sx={{ m: 0, p: 0, ml: 2, mb: 1 }}>
-                <Button variant='contained' onClick={handleIssue}>Issue</Button>
+                <Button disabled={isLoading === true ? true : false} variant='contained' onClick={handleIssue}>{isLoading === false ? 'Issue' : 'Issuing...'}</Button>
             </CardActions>
         </Card>
     )

@@ -16,10 +16,21 @@ const logout = () => {
   localStorage.clear();
 };
 
+const editDetails = async({data,token})=>{
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.post(API_URL + "/edit-details", data, config);
+  return response.data;
+}
+
 const authService = {
   register,
   login,
   logout,
+  editDetails
 };
 
 export default authService;

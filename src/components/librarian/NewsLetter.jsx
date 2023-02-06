@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { newsLetter } from '../../features/admin/adminSlice'
-import ClipLoader from "react-spinners/ClipLoader";
+import { useFormik } from 'formik'
+import { newsLetterSchema } from '../../schema/AdminSchema'
 
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
@@ -11,68 +12,74 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import Button from '@mui/material/Button';
-import SendIcon from '@mui/icons-material/Send';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import Typography from '@mui/material/Typography'
+
+const initialValues = {
+  audience: "",
+  subject: "",
+  body: ""
+}
 
 const NewsLetter = () => {
-  const [audience, setAudience] = useState('')
-  const [subject, setSubject] = useState('')
-  const [body, setBody] = useState('')
   const dispatch = useDispatch()
-  const handleAudience = (e) => {
-    setAudience(e.target.value)
-  }
-  const { isLoading } = useSelector((state) => state.admin)
-  const override = {
-    display: "block",
-    margin: "40%",
-    borderColor: "white",
-  };
-  const handleSend = () => {
-    const data = {
-      audience: audience,
-      subject: subject,
-      body: body
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
+    initialValues: initialValues,
+    validationSchema: newsLetterSchema,
+    onSubmit: (values) => {
+      dispatch(newsLetter(values))
     }
-    dispatch(newsLetter(data))
-  }
+  })
+  const { isLoading } = useSelector((state) => state.admin)
 
   return (
     <>
-      {isLoading === true ? <ClipLoader size={150} cssOverride={override} loading={true} /> :
-        <Box sx={{ minHeight: '77vh', border: '1px solid black', borderRadius: '5px' }}>
-          <Box sx={{ m: 1, minWidth: 120 }}>
-            <FormControl>
-              <InputLabel id="demo-simple-select-label" >Send To:</InputLabel>
-              <Select sx={{ width: 150 }} label="Send To" labelId="demo-simple-select-label" id="demo-simple-select" value={audience} onChange={handleAudience}>
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="subscribers">Subscribers</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <Box sx={{ m: 1 }}>
-            <TextField
-              required
-              id="outlined-required"
-              label="Subject"
-              value={subject}
-              onChange={(e) => { setSubject(e.target.value) }}
-            />
-          </Box>
-          <Box sx={{ m: 1 }}>
-            <TextareaAutosize
-              aria-label="minimum height"
-              minRows={10}
-              placeholder="Body"
-              style={{ width: '100%', border: '0.1px solid #a6bfbc', borderRadius: '4px' }}
-              value={body}
-              onChange={(e) => { setBody(e.target.value) }}
-            />
-          </Box>
-          <Box sx={{ m: 1 }}>
-            <Button onClick={handleSend} variant="outlined" startIcon={<SendIcon />}>Send News</Button>
-          </Box>
+      <Card sx={{ minHeight: '77vh', backgroundColor: '#c4d3f5' }}>
+        <Box sx={{ m: 1, minWidth: 120 }}>
+          <FormControl>
+            <InputLabel id="newsletter-send-to" sx={{ color: errors.audience && touched.audience ? 'red' : '#615b5b' }} >Send To:</InputLabel>
+            <Select sx={{ width: 150 }} label="Send To" name="audience" labelId="demo-simple-select-label" id="newsletter-audience" value={values.audience} onChange={handleChange} onBlur={handleBlur}
+              error={errors.audience && touched.audience}>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="subscribers">Subscribers</MenuItem>
+            </Select>
+          </FormControl>
+          <Typography sx={{ fontSize: 12, pl: 2, color: 'red' }}>{errors.audience && touched.audience ? errors.audience : null}</Typography>
         </Box>
-      }
+        <Box sx={{ m: 1 }}>
+          <TextField
+            required
+            multiline
+            fullWidth
+            id="newsletter-subject"
+            label="Subject"
+            name="subject"
+            value={values.subject}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            helperText={errors.subject && touched.subject ? errors.subject : null}
+            error={errors.subject && touched.subject}
+          />
+        </Box>
+        <Box sx={{ m: 1 }}>
+          <TextareaAutosize
+            id='newsletter-body'
+            aria-label="minimum height"
+            minRows={10}
+            placeholder="Body"
+            style={{ width: '100%', fontSize: 17, borderRadius: 0.1, backgroundColor: 'inherit', borderColor: errors.body && touched.body ? 'red' : '#bfbdb8', borderRadius: '4px' }}
+            name="body"
+            value={values.body}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          <Typography sx={{ fontSize: 12, pl: 2, color: 'red' }}>{errors.audience && touched.audience ? errors.audience : null}</Typography>
+        </Box>
+        <CardActions sx={{}}>
+          <Button disabled={isLoading === true ? true : false} fullWidth onClick={handleSubmit} variant="contained">{isLoading === false ? 'Send News' : 'Sending...'}</Button>
+        </CardActions>
+      </Card>
     </>
   )
 }

@@ -2,24 +2,27 @@ import axios from "axios";
 
 const API_URL = "https://librarymngsys.adaptable.app/api/admin";
 
-const getAllBooks = async ({ data, token }) => {
+const getAllBooks = async ({ data, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
   const result = "?" + new URLSearchParams(data).toString();
   const response = await axios.get(API_URL + "/" + result, config);
   return response.data;
 };
 
-const requested = async (token) => {
+const requested = async ({ data, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
-  const response = await axios.get(API_URL + "/requested", config);
+  const result = "?" + new URLSearchParams(data).toString();
+  const response = await axios.get(API_URL + "/requested" + result, config);
   return response.data;
 };
 
@@ -93,13 +96,15 @@ const deleteBook = async ({ id, token }) => {
   return response.data;
 };
 
-const allUsers = async (token) => {
+const allUsers = async ({ data, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
-  const response = await axios.get(API_URL + "/users", config);
+  const result = "?" + new URLSearchParams(data).toString();
+  const response = await axios.get(API_URL + "/users" + result, config);
   return response.data;
 };
 
@@ -127,13 +132,15 @@ const cancelRequest = async ({ data, token }) => {
   return response.data;
 };
 
-const Subscribers = async (token) => {
+const Subscribers = async ({ data, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
-  const response = await axios.get(API_URL + "/subscribers", config);
+  const result = "?" + new URLSearchParams(data).toString();
+  const response = await axios.get(API_URL + "/subscribers" + result, config);
   return response.data;
 };
 
@@ -147,23 +154,27 @@ const newsLetter = async ({ data, token }) => {
   return response.data;
 };
 
-const dueBooks = async (token) => {
+const dueBooks = async ({ data, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
-  const response = await axios.get(API_URL + "/duebooks", config);
+  const result = "?" + new URLSearchParams(data).toString();
+  const response = await axios.get(API_URL + "/duebooks" + result, config);
   return response.data;
 };
 
-const activityLogs = async (token) => {
+const activityLogs = async ({ data, token, signal }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    signal: signal,
   };
-  const response = await axios.get(API_URL + "/logs", config);
+  const result = "?" + new URLSearchParams(data).toString();
+  const response = await axios.get(API_URL + "/logs" + result, config);
   return response.data;
 };
 
@@ -201,6 +212,28 @@ const updateStock = async ({ data, token }) => {
   return response.data;
 };
 
+const notifyBookDefaulties = async ({ data, token }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.post(API_URL + "/notify", data, config);
+  return response.data;
+};
+
+const blockedUsers = async ({ data, token, signal }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    signal: signal,
+  };
+  const result = "?" + new URLSearchParams(data).toString();
+  const response = await axios.get(API_URL + "/blocked" + result, config);
+  return response.data;
+};
+
 const adminService = {
   getAllBooks,
   requested,
@@ -220,6 +253,8 @@ const adminService = {
   block,
   unblock,
   updateStock,
+  notifyBookDefaulties,
+  blockedUsers,
 };
 
 export default adminService;

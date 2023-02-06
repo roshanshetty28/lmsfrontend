@@ -25,15 +25,15 @@ const unsuccessful = {
 };
 
 const initialState = {
-  inventory: [],
-  requestedBooks: [],
+  inventory: { books: [], total: 0 },
+  requestedBooks: { books: [], total: 0 },
   issued: {},
   unissued: {},
-  users: [],
-  subscribers: [],
-  duebooks: [],
-  logs: [],
-  page: 1,
+  users: { users: [], total: 0 },
+  subscribers: { users: [], total: 0 },
+  duebooks: { books: [], total: 0 },
+  logs: { logs: [], total: 0 },
+  blocked: { users: [], total: 0 },
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -45,7 +45,7 @@ export const getAllBooks = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return adminService.getAllBooks({ data, token });
+      return adminService.getAllBooks({ data, token, signal: thunkAPI.signal });
     } catch (error) {
       const message =
         (error.response &&
@@ -60,10 +60,14 @@ export const getAllBooks = createAsyncThunk(
 
 export const reqBooks = createAsyncThunk(
   "admin/requested",
-  async (_, thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await adminService.requested(token);
+      return await adminService.requested({
+        data,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -186,10 +190,14 @@ export const deleteBook = createAsyncThunk(
 
 export const allUsers = createAsyncThunk(
   "admin/allUsers",
-  async (_, thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await adminService.allUsers(token);
+      return await adminService.allUsers({
+        data,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -240,10 +248,14 @@ export const cancelRequest = createAsyncThunk(
 
 export const getSubscribers = createAsyncThunk(
   "admin/subscribers",
-  async (_, thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await adminService.Subscribers(token);
+      return await adminService.Subscribers({
+        data,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -276,10 +288,14 @@ export const newsLetter = createAsyncThunk(
 
 export const dueBooks = createAsyncThunk(
   "admin/dueBooks",
-  async (_, thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await adminService.dueBooks(token);
+      return await adminService.dueBooks({
+        data,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -294,10 +310,14 @@ export const dueBooks = createAsyncThunk(
 
 export const activityLogs = createAsyncThunk(
   "admin/logs",
-  async (_, thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await adminService.activityLogs(token);
+      return await adminService.activityLogs({
+        data,
+        token,
+        signal: thunkAPI.signal,
+      });
     } catch (error) {
       const message =
         (error.response &&
@@ -358,20 +378,61 @@ export const updateStock = createAsyncThunk(
     }
   }
 );
+
+export const notifyBookDefaulties = createAsyncThunk(
+  "admin/bookDefaulties",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await adminService.notifyBookDefaulties({ data, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const blockedUsers = createAsyncThunk(
+  "admin/blocked",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await adminService.blockedUsers({
+        data,
+        token,
+        signal: thunkAPI.signal,
+      });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const adminSlice = createSlice({
   name: "admin",
   initialState,
   reducers: {
     resetAdmin: (state) => {
-      state.inventory = [];
-      state.requestedBooks = [];
+      state.inventory = { books: [], total: 0 };
+      state.requestedBooks = { books: [], total: 0 };
       state.issued = {};
       state.unissued = {};
-      state.users = [];
-      state.subscribers = [];
-      state.duebooks = [];
-      state.logs = [];
-      state.page = 1;
+      state.users = { users: [], total: 0 };
+      state.subscribers = { users: [], total: 0 };
+      state.duebooks = { books: [], total: 0 };
+      state.logs = { logs: [], total: 0 };
+      state.blocked = { users: [], total: 0 };
       state.isError = false;
       state.isSuccess = false;
       state.isLoading = false;
@@ -386,8 +447,10 @@ export const adminSlice = createSlice({
       .addCase(getAllBooks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.inventory = action.payload.books;
-        state.page = action.payload.total;
+        state.inventory.books = action.payload.result;
+        state.inventory.books.length === 0
+          ? (state.inventory.total = 0)
+          : (state.inventory.total = action.payload.count.count);
       })
       .addCase(getAllBooks.rejected, (state, action) => {
         state.isLoading = false;
@@ -401,7 +464,7 @@ export const adminSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.issued = action.payload;
-        state.requestedBooks = state.requestedBooks.filter(
+        state.requestedBooks.books = state.requestedBooks.books.filter(
           (book) => book._id !== action.payload._id
         );
         toast.success("Book Issue Successful!", successful);
@@ -469,7 +532,10 @@ export const adminSlice = createSlice({
       .addCase(reqBooks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.requestedBooks = action.payload;
+        state.requestedBooks.books = action.payload.result;
+        state.requestedBooks.books.length === 0
+          ? (state.requestedBooks.total = 0)
+          : (state.requestedBooks.total = action.payload.count.count);
       })
       .addCase(reqBooks.rejected, (state, action) => {
         state.isLoading = false;
@@ -479,7 +545,7 @@ export const adminSlice = createSlice({
       .addCase(addBook.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addBook.fulfilled, (state) => {
+      .addCase(addBook.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
         toast.success("Book Successfully Added to Inventory", successful);
@@ -499,7 +565,7 @@ export const adminSlice = createSlice({
       .addCase(deleteBook.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.inventory = state.inventory.filter(
+        state.inventory.books = state.inventory.books.filter(
           (book) => book._id !== action.payload.id
         );
         toast.success("Book Deleted Successfully.", successful);
@@ -519,7 +585,10 @@ export const adminSlice = createSlice({
       .addCase(allUsers.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.users = action.payload;
+        state.users.users = action.payload.result;
+        state.users.users.length === 0
+          ? (state.users.total = 0)
+          : (state.users.total = action.payload.count.count);
       })
       .addCase(allUsers.rejected, (state, action) => {
         state.isLoading = false;
@@ -532,7 +601,7 @@ export const adminSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.users = state.users.filter(
+        state.users.users = state.users.users.filter(
           (user) => user._id !== action.payload.id
         );
         toast.success("User Deleted Successfully.", successful);
@@ -552,17 +621,12 @@ export const adminSlice = createSlice({
       .addCase(cancelRequest.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        console.log(action.payload._id);
-        state.requestedBooks = state.requestedBooks.filter(
-          (book) => book._id !== action.payload._id
-        );
         toast.success("Request Cancelled Successfully.", successful);
       })
       .addCase(cancelRequest.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
-        console.log(action.payload._id);
         toast.error(
           "Could not cancel request. Reason: " + state.message,
           unsuccessful
@@ -574,8 +638,11 @@ export const adminSlice = createSlice({
       .addCase(getSubscribers.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        console.log(action);
-        state.subscribers = action.payload;
+
+        state.subscribers.users = action.payload.result;
+        state.subscribers.users.length === 0
+          ? (state.subscribers.total = 0)
+          : (state.subscribers.total = action.payload.count.count);
       })
       .addCase(getSubscribers.rejected, (state, action) => {
         state.isLoading = false;
@@ -605,7 +672,10 @@ export const adminSlice = createSlice({
       .addCase(dueBooks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.duebooks = action.payload;
+        state.duebooks.books = action.payload.result;
+        state.duebooks.books.length === 0
+          ? (state.duebooks.total = 0)
+          : (state.duebooks.total = action.payload.count.count);
       })
       .addCase(dueBooks.rejected, (state, action) => {
         state.isLoading = false;
@@ -618,7 +688,10 @@ export const adminSlice = createSlice({
       .addCase(activityLogs.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.logs = action.payload;
+        state.logs.logs = action.payload.result;
+        state.logs.logs.length === 0
+          ? (state.logs.total = 0)
+          : (state.logs.total = action.payload.count.count);
       })
       .addCase(activityLogs.rejected, (state, action) => {
         state.isLoading = false;
@@ -631,10 +704,10 @@ export const adminSlice = createSlice({
       .addCase(block.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.users = state.users.filter(
+        state.users.users = state.users.users.filter(
           (user) => user._id !== action.payload._id
         );
-        state.users.push(action.payload);
+        state.users.users.push(action.payload);
         toast.success("User Blocked Successfully", successful);
       })
       .addCase(block.rejected, (state, action) => {
@@ -652,10 +725,10 @@ export const adminSlice = createSlice({
       .addCase(unblock.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.users = state.users.filter(
+        state.users.users = state.users.users.filter(
           (user) => user._id !== action.payload._id
         );
-        state.users.push(action.payload);
+        state.users.users.push(action.payload);
         toast.success("User Unblocked Successfully", successful);
       })
       .addCase(unblock.rejected, (state, action) => {
@@ -673,10 +746,10 @@ export const adminSlice = createSlice({
       .addCase(updateStock.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.inventory = state.inventory.filter(
+        state.inventory.books = state.inventory.books.filter(
           (book) => book._id !== action.payload._id
         );
-        state.inventory.push(action.payload);
+        state.inventory.books.push(action.payload);
         toast.success("Stock Updated Successfully", successful);
       })
       .addCase(updateStock.rejected, (state, action) => {
@@ -685,6 +758,42 @@ export const adminSlice = createSlice({
         state.message = action.payload;
         toast.error(
           "Could not update Stock. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(notifyBookDefaulties.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(notifyBookDefaulties.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(notifyBookDefaulties.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not notify users. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(blockedUsers.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(blockedUsers.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.blocked.users = action.payload.result;
+        state.blocked.users.length === 0
+          ? (state.blocked.total = 0)
+          : (state.blocked.total = action.payload.count.count);
+      })
+      .addCase(blockedUsers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not get blocked users. Reason: " + state.message,
           unsuccessful
         );
       });
