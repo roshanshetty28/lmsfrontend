@@ -17,8 +17,8 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 
 const initialValues = {
-  email: "ad@gm.co",
-  password: "John@222",
+  email: "",
+  password: "",
 }
 
 const Login = () => {

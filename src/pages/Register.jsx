@@ -14,10 +14,10 @@ import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
 
 const initialValues = {
-    name: "John",
-    email: "ak@gm.co",
-    password: "John@222",
-    password2: "John@222"
+    name: "",
+    email: "",
+    password: "",
+    password2: ""
 }
 
 const Register = () => {
