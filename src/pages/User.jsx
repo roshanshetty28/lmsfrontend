@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 import MenuIcon from '@mui/icons-material/Menu';
@@ -13,6 +13,7 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 
 const User = () => {
+  const location = useLocation()
   const { user } = useSelector((state) => state.auth)
   const navigate = useNavigate();
   const requiredWidth = useMediaQuery("(max-width:400px)");
@@ -82,7 +83,7 @@ const User = () => {
           </Box>
         </nav>
       </Drawer>
-      <Outlet />
+      {JSON.stringify(location.pathname) == JSON.stringify("/users") ? <Navigate to='/users/userinventory' /> : <Outlet />}
     </div>
   );
 };

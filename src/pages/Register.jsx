@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from 'react-redux'
 import { register, reset } from "../features/auth/authSlice"
+import { useGoogleLogin } from '@react-oauth/google';
 import { useFormik } from 'formik'
 import { registerSchema } from '../schema/AuthSchema'
 import Footer from '../components/Footer';
@@ -12,6 +13,7 @@ import Button from '@mui/material/Button';
 import Typography from "@mui/material/Typography";
 import Card from '@mui/material/Card';
 import Divider from '@mui/material/Divider';
+import GoogleIcon from '@mui/icons-material/Google';
 
 const initialValues = {
     name: "",
@@ -32,6 +34,11 @@ const Register = () => {
             resetForm()
         }
     })
+    const googleLogin = useGoogleLogin({ onSuccess: handleGoogleLoginSuccess });
+    function handleGoogleLoginSuccess(tokenResponse) {
+        const accessToken = tokenResponse.access_token;
+        dispatch(register({ accessToken: accessToken }))
+    }
     useEffect(() => {
         if (isSuccess) {
             navigate('/users')
@@ -104,6 +111,10 @@ const Register = () => {
                 </Box>
                 <Box>
                     <Button disabled={isLoading === true ? true : false} sx={{ m: 2 }} type="submit" variant='contained' onClick={handleSubmit}>{isLoading === false ? 'Submit' : 'Submitting...'}</Button>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '20%' }}><Divider sx={{ width: '1' }} />&nbsp;&nbsp;<Typography>or</Typography>&nbsp;&nbsp;<Divider sx={{ width: '1' }} /></Box>
+                <Box><Button sx={{ m: 2 }} variant='contained' onClick={() => googleLogin()} startIcon={<GoogleIcon />} >
+                    Register with google</Button>
                 </Box>
             </Card>
             <Divider sx={{ width: '100%', m: 2 }} />

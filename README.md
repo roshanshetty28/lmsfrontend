@@ -46,8 +46,12 @@ h. Related Books - The ability to view all books related to a specific genre.
 i. Review - The ability to rate and comment on books they have issued.
 </pre>
 
+### Other Features
+- OAuth2.0 Google SignIn
+- Everyday at 10:00am, the server automatically sends reminder emails to all library users who have books due.
+
 ### General
- This frontend of this website is hosted on Netlify and backend is hosted on Adaptable. 
+This frontend of this website is hosted on Netlify and backend is hosted on Adaptable. 
 
 ## Getting Started
 
@@ -70,6 +74,9 @@ i. Review - The ability to rate and comment on books they have issued.
 - mongoose
 - express-async-handler
 - nodemailer
+- node-cron
+- cors
+- axios
 
 #### Dev Dependencies
 
@@ -115,7 +122,6 @@ npm run start
 
 ## Future Scope
 These are following features which can be added further to this web-app to make it better.
-- OAuth Sign-Up/Sign-In
 - Caching Data
 - Database Indexing
 - Cookies
@@ -145,6 +151,8 @@ Mobile No.:  +91 99306 56759
   - Initial Release
 - 0.2
   - Second Release
+- 0.3
+  - Third Release
 
 ## License
 
@@ -157,3 +165,4 @@ Inspiration, code snippets, etc.
 - [Stackoverflow](https://stackoverflow.com/)
 - [Adaptable.io](https://adaptable.io)
 - [Netlify](http://app.netlify.com)
+- [Digital Ocean](https://www.digitalocean.com/community/tutorials/nodejs-cron-jobs-by-examples)

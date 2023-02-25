@@ -5,10 +5,10 @@ import Typography from '@mui/material/Typography'
 
 const About = () => {
   return (
-    <Box>
-        <Typography variant='h5' sx={{textAlign:'center',fontWeight:600}}>About the Website</Typography>
-        <Typography variant='p'>This web-app is a Library Management System. This website caters the needs of Librarian as well as general Users.</Typography>
-        <Typography>The Librarian </Typography>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Typography variant='h5' sx={{ textAlign: 'center', fontWeight: 600 }}>About the Website</Typography>
+      <Typography>Read about this Project <a href='https://github.com/roshanshetty28/lmsbackend#library-management-system'>here</a>, in github.</Typography>
+      <Typography>About page coming soon.</Typography>
     </Box>
   )
 }
