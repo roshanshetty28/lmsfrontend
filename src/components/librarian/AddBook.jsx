@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { addBook } from '../../features/admin/adminSlice'
+import { addBook, uploadEbook } from '../../features/admin/adminSlice'
 import { useFormik } from 'formik'
 import { addBookSchema } from '../../schema/AdminSchema'
 
@@ -10,23 +10,32 @@ import Button from '@mui/material/Button';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 const initialValues = {
-  title: "knk",
-  author: "jn",
-  total: "1",
-  rating: "1",
-  numOfRatings: "1",
-  genre: ['action']
+  title: "",
+  author: "",
+  total: "",
+  rating: "",
+  numOfRatings: "",
+  genre: []
 }
 
 const AddBook = () => {
   const dispatch = useDispatch()
+  const [file, setFile] = useState();
+  const [open, setOpen] = useState(false);
+  const { uploadedBook } = useSelector(state => state.admin)
   const { values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue } = useFormik({
     initialValues: initialValues,
     validationSchema: addBookSchema,
-    onSubmit: async(values, { resetForm }) => {
+    onSubmit: async (values, { resetForm }) => {
       dispatch(addBook(values))
+      setOpen(true)
       resetForm()
     }
   })
@@ -39,6 +48,22 @@ const AddBook = () => {
       setFieldValue("genre", values.genre.filter((sel) => sel !== e.target.value));
     }
   };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleEbookUpload = () => {
+    if (file === undefined) {
+      alert("Select a PDF to Upload")
+      setOpen(false)
+    }
+    else {
+      const formData = new FormData()
+      formData.append("id", uploadedBook._id)
+      formData.append("file", file)
+      dispatch(uploadEbook(formData))
+      setOpen(false)
+    }
+  }
   return (
     <Card sx={{ m: 2, p: 2, backgroundColor: '#c4d3f5' }}>
       <Box sx={{ m: 1 }}>
@@ -84,7 +109,6 @@ const AddBook = () => {
           onBlur={handleBlur}
           helperText={errors.rating && touched.rating ? errors.rating : null}
           error={errors.rating && touched.rating}
-
         />
       </Box>
       <Box sx={{ m: 1 }}>
@@ -100,7 +124,6 @@ const AddBook = () => {
           onBlur={handleBlur}
           helperText={errors.numOfRatings && touched.numOfRatings ? errors.numOfRatings : null}
           error={errors.numOfRatings && touched.numOfRatings}
-
         />
       </Box>
       <Box sx={{ border: '0.1px solid #9fa3ab', borderRadius: '5px', m: 1, width: 222, display: 'flex', flexDirection: 'column' }}>
@@ -142,6 +165,29 @@ const AddBook = () => {
       <Box sx={{ pl: 1, display: 'flex', justifyContent: 'center' }}>
         <Button disabled={isLoading === true ? true : false} fullWidth sx={{ backgroundColor: '#89e681', '&:hover': { backgroundColor: '#5ad14f' } }} variant='contained' onClick={handleSubmit} startIcon={<AddCircleOutlineIcon />}>{isLoading === false ? 'Add Book' : 'Adding...'}</Button>
       </Box>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Upload E-Book</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Do You Want to upload a E-Book for this book?
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="EBook"
+            type="file"
+            fullWidth
+            variant="standard"
+            inputProps={{ accept: "application/pdf" }}
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleEbookUpload}>Upload</Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 };

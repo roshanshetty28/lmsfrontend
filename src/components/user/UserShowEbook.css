@@ -1,0 +1,35 @@
+.document {
+    display: flex;
+    margin-bottom: 10px;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.pagination {
+    display: flex;
+    margin: 0;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info {
+    display: flex;
+    margin: 0;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.buttons {
+    display: flex;
+    margin: 0;
+    flex-direction: row;
+    justify-content: center;
+    gap: 7%;
+}
+
+@media print {
+    .document {
+        display: none;
+    }
+}

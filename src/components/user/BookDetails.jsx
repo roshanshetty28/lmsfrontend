@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useFormik } from 'formik'
-import { bookDetails, relatedBooks, getComments, addReview } from '../../features/user/userSlice'
+import { bookDetails, relatedBooks, getComments, addReview, getEbook } from '../../features/user/userSlice'
 import { addToWish } from '../../features/user/userSlice'
 import { reviewValidation } from '../../schema/UserSchema'
 import ReactPaginate from 'react-paginate';
@@ -33,9 +33,10 @@ const BookDetails = () => {
     const dispatch = useDispatch()
     const { bookId } = useParams()
     const [curPage, setcurPage] = useState(1)
+    const [option, setOption] = useState(true)
     const [writeReview, setWriteReview] = useState(false)
     const { user } = useSelector((state) => state.auth)
-    const { book, isLoading, related, comments } = useSelector((state) => state.user)
+    const { book, isLoading, related, comments, ebook } = useSelector((state) => state.user)
     const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
         initialValues: initialValues,
         validationSchema: reviewValidation,
@@ -59,6 +60,11 @@ const BookDetails = () => {
             promise2?.abort()
         }
     }, [book, curPage])
+    useEffect(() => {
+        if (book._id !== undefined && user.issued.includes(book._id)) {
+            setOption(false)
+        }
+    }, [book])
     const handleWriteReview = () => {
         setWriteReview(!writeReview)
     }
@@ -68,6 +74,10 @@ const BookDetails = () => {
     }
     const handlePageClick = (data) => {
         setcurPage(data.selected + 1);
+    }
+    const handlePreview = () => {
+        const id = book._id.toString()
+        window.open("https://librarymngsys.netlify.app/e-book/" + id, "_blank")
     }
     return (
         <>
@@ -93,7 +103,9 @@ const BookDetails = () => {
                                     readOnly />
                             </Box>
                             <Typography>Book ID:&nbsp;{book._id}</Typography>
-                            <Box></Box>
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                                <Button sx={{ my: 2 }} variant='contained' disabled={book.ebook == null || option === true} onClick={handlePreview}>Preview E-Book</Button>
+                            </Box>
                         </Box>
                     </Box>
                     <Box sx={{ width: { md: '50%', xs: '100%' } }}>

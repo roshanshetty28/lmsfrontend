@@ -199,6 +199,17 @@ const modifyComment = async ({ data, token }) => {
   return response.data;
 };
 
+const getEbook = async ({ id, token }) => {
+  const config = {
+    responseType: "blob",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.get(API_URL + `/ebook/${id}`, config);
+  return response.data;
+};
+
 const userService = {
   getAllBooks,
   getIssuedBooks,
@@ -219,6 +230,7 @@ const userService = {
   deleteComment,
   addReview,
   modifyComment,
+  getEbook,
 };
 
 export default userService;

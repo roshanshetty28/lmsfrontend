@@ -34,6 +34,7 @@ const initialState = {
   duebooks: { books: [], total: 0 },
   logs: { logs: [], total: 0 },
   blocked: { users: [], total: 0 },
+  uploadedBook: {},
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -419,6 +420,42 @@ export const blockedUsers = createAsyncThunk(
   }
 );
 
+export const uploadEbook = createAsyncThunk(
+  "admin/uploadEbook",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await adminService.uploadEbook({ data, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const getEbook = createAsyncThunk(
+  "admin/getEbook",
+  async (id, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await adminService.getEbook({ id, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const adminSlice = createSlice({
   name: "admin",
   initialState,
@@ -433,6 +470,7 @@ export const adminSlice = createSlice({
       state.duebooks = { books: [], total: 0 };
       state.logs = { logs: [], total: 0 };
       state.blocked = { users: [], total: 0 };
+      state.uploadedBook = {};
       state.isError = false;
       state.isSuccess = false;
       state.isLoading = false;
@@ -548,6 +586,7 @@ export const adminSlice = createSlice({
       .addCase(addBook.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.uploadedBook = action.payload;
         toast.success("Book Successfully Added to Inventory", successful);
       })
       .addCase(addBook.rejected, (state, action) => {
@@ -794,6 +833,40 @@ export const adminSlice = createSlice({
         state.message = action.payload;
         toast.error(
           "Could not get blocked users. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(uploadEbook.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(uploadEbook.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        toast.success("E-Book uploaded Successfully", successful);
+      })
+      .addCase(uploadEbook.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not upload E-Book. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(getEbook.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getEbook.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.ebook = action.payload;
+      })
+      .addCase(getEbook.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not Fetch E-Book. Reason: " + state.message,
           unsuccessful
         );
       });

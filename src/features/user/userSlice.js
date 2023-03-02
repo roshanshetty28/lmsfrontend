@@ -33,6 +33,7 @@ const initialState = {
   wishlist: [],
   comments: [],
   pages: 1,
+  ebook: null,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -396,6 +397,19 @@ export const modifyComment = createAsyncThunk(
   }
 );
 
+export const getEbook = createAsyncThunk("user/ebook", async (id, thunkAPI) => {
+  try {
+    const token = thunkAPI.getState().auth.user.token;
+    return await userService.getEbook({ id, token });
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 export const userBooksSlice = createSlice({
   name: "user",
   initialState,
@@ -408,6 +422,7 @@ export const userBooksSlice = createSlice({
       state.book = {};
       state.wishlist = [];
       state.comments = [];
+      state.ebook = null;
       state.isError = false;
       state.isSuccess = false;
       state.isLoading = false;
@@ -729,6 +744,23 @@ export const userBooksSlice = createSlice({
         state.message = action.payload;
         toast.error(
           "Could not update comment. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(getEbook.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getEbook.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.ebook = action.payload;
+      })
+      .addCase(getEbook.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not Fetch E-Book. Reason: " + state.message,
           unsuccessful
         );
       });

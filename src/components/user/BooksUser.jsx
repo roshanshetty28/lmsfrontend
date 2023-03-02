@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { requestBook, cancelRequest, addToWish } from '../../features/user/userSlice'
-import { useNavigate } from 'react-router-dom'
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -17,11 +16,9 @@ import Tooltip from '@mui/material/Tooltip';
 
 const BooksUser = ({ book }) => {
   const { user } = useSelector((state) => state.auth)
-  const {userIssued}= useSelector((state)=>state.user)
   const [option, setOption] = useState(true)
   const [request, setRequest] = useState(true)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const handleRequest = () => {
     if (window.confirm(`Do want to request "${book.title}"`)) {
       const id = book._id.toString()
@@ -71,7 +68,7 @@ const BooksUser = ({ book }) => {
               readOnly
             /></Box>
           <Typography>Book ID:&nbsp;{book._id}</Typography>
-          <Typography>Due Date:&nbsp;{book.users.map((b)=>Date(b.dueDate).toLocaleString().slice(4,15))}</Typography>
+          <Typography>Due Date:&nbsp;{book.users.map((b) => Date(b.dueDate).toLocaleString().slice(4, 15))}</Typography>
         </CardContent>
         <CardActions>
           <Button variant='outlined' onClick={handleView}>View</Button>

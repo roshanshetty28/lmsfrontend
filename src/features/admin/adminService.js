@@ -234,6 +234,27 @@ const blockedUsers = async ({ data, token, signal }) => {
   return response.data;
 };
 
+const uploadEbook = async ({ data, token }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.post(API_URL + "/ebook", data, config);
+  return response.data;
+};
+
+const getEbook = async ({ id, token }) => {
+  const config = {
+    responseType: "blob",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.get(API_URL + `/ebook/${id}`, config);
+  return response.data;
+};
+
 const adminService = {
   getAllBooks,
   requested,
@@ -255,6 +276,8 @@ const adminService = {
   updateStock,
   notifyBookDefaulties,
   blockedUsers,
+  uploadEbook,
+  getEbook,
 };
 
 export default adminService;

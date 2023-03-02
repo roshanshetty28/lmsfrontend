@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
 // for components
 import AdminProtectRoute from "./components/AdminProtectRoute";
 import UserProtectRoute from "./components/UserProtectRoute";
@@ -28,6 +29,9 @@ const AddBook = lazy(() => import("./components/librarian/AddBook"));
 const BlockedUsers = lazy(() => import("./components/librarian/BlockedUsers"));
 const UserDetails = lazy(() => import("./components/librarian/UserDetails"));
 const ActivityLogs = lazy(() => import("./components/librarian/ActivityLogs"));
+const AdminShowEbook = lazy(() =>
+  import("./components/librarian/AdminShowEbook")
+);
 
 // for user
 const BookDetails = lazy(() => import("./components/user/BookDetails"));
@@ -40,6 +44,7 @@ const Contact = lazy(() => import("./components/user/Contact"));
 const WishList = lazy(() => import("./components/user/WishList"));
 const MyAccount = lazy(() => import("./components/user/MyAccount"));
 const EditProfile = lazy(() => import("./components/user/EditProfile"));
+const UserShowEbook = lazy(() => import("./components/user/UserShowEbook"));
 
 function App() {
   return (
@@ -62,6 +67,7 @@ function App() {
                 <Route path="logs" element={<ActivityLogs />} />
                 <Route path="blocked" element={<BlockedUsers />} />
               </Route>
+              <Route path="/ebook/:bookId" element={<AdminShowEbook />} />
             </Route>
             <Route element={<UserProtectRoute />}>
               <Route path="/users" element={<User />}>
@@ -71,6 +77,7 @@ function App() {
                 <Route path=":bookId" element={<BookDetails />} />
                 <Route path="wishlist" element={<WishList />} />
               </Route>
+              <Route path="/e-book/:bookId" element={<UserShowEbook />} />
               <Route path="/account" element={<MyAccount />} />
               <Route path="/edit-profile" element={<EditProfile />} />
             </Route>

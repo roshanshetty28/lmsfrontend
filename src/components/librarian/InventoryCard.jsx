@@ -16,6 +16,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import Rating from '@mui/material/Rating';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 
 const InventoryCard = ({ book }) => {
     const { isLoading } = useSelector((state) => state.admin)
@@ -42,9 +44,13 @@ const InventoryCard = ({ book }) => {
     const handleDelete = () => {
         dispatch(deleteBook(book._id))
     }
+    const handlePreview = () => {
+        const id = book._id.toString()
+        window.open("https://librarymngsys.netlify.app/ebook/" + id, "_blank")
+    }
     return (
         <Card sx={{ p: 1, m: 1, pr: 2, pl: 0, minWidth: 240, backgroundColor: '#84ceeb', boxShadow: '1px 2px #3f48f2' }}>
-            <CardHeader sx={{ pb: 0 }} title={book.title}>
+            <CardHeader sx={{ pb: 0, pl: 2, pr: 0 }} title={book.title} action={<IconButton onClick={handleDelete}><DeleteIcon style={{ color: '#ed6f80' }} /></IconButton>}>
             </CardHeader>
             <CardContent sx={{ mt: 0, pt: 0, pb: 0 }}>
                 <Typography>Author:&nbsp;{book.author}</Typography>
@@ -86,8 +92,8 @@ const InventoryCard = ({ book }) => {
                 </CardContent>
             </Collapse>
             <CardActions sx={{ m: 0, p: 0, ml: 2, mb: 1 }}>
-                <Button disabled={isLoading === true ? true : false} variant='outlined' color='error' onClick={handleDelete}>{isLoading === false ? 'Delete Book' : 'Deleting...'}</Button>
                 <Button disabled={isLoading === true ? true : false} variant='contained' onClick={handleQuantity}>{isLoading === false ? 'Update Quantity' : 'Updating...'}</Button>
+                <Button disabled={book.ebook == null ? true : isLoading === true ? true : false} variant="outlined" onClick={handlePreview}>{isLoading === false ? 'Preview E-Book' : 'Loading...'}</Button>
             </CardActions>
 
         </Card>
