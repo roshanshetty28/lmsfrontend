@@ -47,6 +47,7 @@ const Librarian = () => {
           <NavLink to="/news">News Letter</NavLink>
           <NavLink to="/logs">Activity Logs</NavLink>
           <NavLink to="/blocked">Blocked Users</NavLink>
+          <NavLink to="/update-plan">Update Plan</NavLink>
         </nav> : <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 1 }}><IconButton onClick={handleOpen}><MenuIcon style={{ color: 'black' }} /></IconButton><Typography>Menu</Typography>
         </Box>}
         <Drawer
@@ -109,6 +110,9 @@ const Librarian = () => {
             </Box>
             <Box className="elemBox">
               <NavLink to="/logs">Blocked Users</NavLink>
+            </Box>
+            <Box className="elemBox">
+              <NavLink to="/update-plan">Update Plan</NavLink>
             </Box>
           </nav>
         </Drawer>

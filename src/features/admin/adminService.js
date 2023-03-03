@@ -255,6 +255,21 @@ const getEbook = async ({ id, token }) => {
   return response.data;
 };
 
+const updatePlan = async ({ data, token }) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.put(
+    API_URL + `/update-plan/${data.id}`,
+    { months: data.months },
+    config
+  );
+  console.log(response.data);
+  return response.data;
+};
+
 const adminService = {
   getAllBooks,
   requested,
@@ -278,6 +293,7 @@ const adminService = {
   blockedUsers,
   uploadEbook,
   getEbook,
+  updatePlan,
 };
 
 export default adminService;

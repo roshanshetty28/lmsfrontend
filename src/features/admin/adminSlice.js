@@ -456,6 +456,24 @@ export const getEbook = createAsyncThunk(
   }
 );
 
+export const UpdatePlan = createAsyncThunk(
+  "admin/updatePlan",
+  async (data, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await adminService.updatePlan({ data, token });
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const adminSlice = createSlice({
   name: "admin",
   initialState,
@@ -867,6 +885,23 @@ export const adminSlice = createSlice({
         state.message = action.payload;
         toast.error(
           "Could not Fetch E-Book. Reason: " + state.message,
+          unsuccessful
+        );
+      })
+      .addCase(UpdatePlan.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(UpdatePlan.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        toast.success("Plan Updated Successfully", successful);
+      })
+      .addCase(UpdatePlan.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+        toast.error(
+          "Could not update plan. Reason: " + state.message,
           unsuccessful
         );
       });

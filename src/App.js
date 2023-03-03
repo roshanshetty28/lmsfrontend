@@ -29,6 +29,7 @@ const AddBook = lazy(() => import("./components/librarian/AddBook"));
 const BlockedUsers = lazy(() => import("./components/librarian/BlockedUsers"));
 const UserDetails = lazy(() => import("./components/librarian/UserDetails"));
 const ActivityLogs = lazy(() => import("./components/librarian/ActivityLogs"));
+const UpdatePlan = lazy(() => import("./components/librarian/UpdatePlan"));
 const AdminShowEbook = lazy(() =>
   import("./components/librarian/AdminShowEbook")
 );
@@ -66,6 +67,7 @@ function App() {
                 <Route path="duebooks" element={<DueBooks />} />
                 <Route path="logs" element={<ActivityLogs />} />
                 <Route path="blocked" element={<BlockedUsers />} />
+                <Route path="update-plan" element={<UpdatePlan />} />
               </Route>
               <Route path="/ebook/:bookId" element={<AdminShowEbook />} />
             </Route>
