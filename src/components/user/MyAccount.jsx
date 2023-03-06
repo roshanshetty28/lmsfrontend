@@ -14,34 +14,33 @@ const MyAccount = () => {
     const handleUnsubscribe = () => {
         dispatch(unsubscribe(id))
     }
-
     const handleSubscribe = () => {
         dispatch(subscribe())
     }
-    const { user } = useSelector((state) => state.auth)
+    const { user, isLoading } = useSelector((state) => state.auth)
     return (
         <Box>
             <Box>
                 <Typography variant="h6">Newsletter Subscription</Typography>
-                {user.subscriber === true ? 
-                <Box sx={{diplay:"flex", flexDirection:'column'}}>
-                    <Box sx={{mb:1}}>
-                        <TextField
-                            required
-                            id="outlined-required"
-                            label="ID"
-                            value={id}
-                            onChange={(e) => { setID(e.target.value) }}
-                        />
-                    </Box>
-                    <Box>
-                        <Button variant="contained" color="error" onClick={handleUnsubscribe}>Unsubscribe</Button>
-                    </Box>
-                </Box> : <Box>
-                    <Button color='success' variant='contained' onClick={handleSubscribe}>Subscribe</Button>
-                </Box>}
+                {user.subscriber === true ?
+                    <Box sx={{ diplay: "flex", flexDirection: 'column' }}>
+                        <Box sx={{ mb: 1 }}>
+                            <TextField
+                                required
+                                id="outlined-required"
+                                label="ID"
+                                value={id}
+                                onChange={(e) => { setID(e.target.value) }}
+                            />
+                        </Box>
+                        <Box>
+                            <Button variant="contained" color="error" onClick={handleUnsubscribe}>Unsubscribe</Button>
+                        </Box>
+                    </Box> : <Box>
+                        <Button color='success' variant='contained' disabled={isLoading === true ? true : false} onClick={handleSubscribe}>{isLoading === true ? "Subscribing..." : "Subscribe"}</Button>
+                    </Box>}
             </Box>
-            <Divider sx={{ p:1}}/>
+            <Divider sx={{ p: 1 }} />
             <Box>
                 <Typography variant='h6'>Subscription Plans</Typography>
                 <Typography>2 months remaining</Typography>

@@ -543,9 +543,10 @@ export const userBooksSlice = createSlice({
       .addCase(unsubscribe.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(unsubscribe.fulfilled, (state) => {
+      .addCase(unsubscribe.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        localStorage.setItem("user", JSON.stringify(action.payload));
         toast.success("Unsubscribed Sucessfully", successful);
       })
       .addCase(unsubscribe.rejected, (state, action) => {
@@ -659,9 +660,10 @@ export const userBooksSlice = createSlice({
       .addCase(subscribe.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(subscribe.fulfilled, (state) => {
+      .addCase(subscribe.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        localStorage.setItem("user", JSON.stringify(action.payload));
         toast.success("Subscription to newsletter successful", successful);
       })
       .addCase(subscribe.rejected, (state, action) => {
