@@ -56,7 +56,10 @@ j. View E-Book - Users can view PDF of their issued books in realtime
 </pre>
 
 ### General
-This frontend of this website is hosted on Netlify and backend is hosted on Adaptable. 
+
+![image](https://user-images.githubusercontent.com/87028457/223473009-ac7da080-f0a6-4648-b28e-c9fd58eb01dc.png)
+
+While I incorporated some advanced web development techniques, the website may still appear somewhat sluggish due to various reasons, which are explained further. The client's request needs to go through two separate servers and wait for their responses, which may cause a delay ranging from a few microseconds to a couple of seconds. This approach simplifies website deployment, allowing more time for development to be maximized. The website's sluggishness can also be attributed to my extensive use of MaterialUI, as I aimed to gain a deep understanding of the framework despite its significant import cost due to the large package sizes.
 
 ## Getting Started
 
